@@ -6,3 +6,4 @@ psycopg2-binary==2.9.9
 pydeck
 SQLAlchemy==2.0.23
 streamlit
+streamlit-aggrid
