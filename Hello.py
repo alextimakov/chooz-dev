@@ -8,7 +8,6 @@ select_all = '''
     kinopoisk_id,
     imdb_id,
     name_ru,
-    name_en,
     name_orig,
     film_type,
     film_year, 
@@ -16,8 +15,7 @@ select_all = '''
     ARRAY(select jsonb_array_elements(genres::jsonb) ->> 'genre') as genre,
     rating_kinopoisk,
     rating_imdb,
-    poster_url,
-    poster_url_preview
+    poster_url
   FROM films
   LIMIT 500;
 '''
