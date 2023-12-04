@@ -51,7 +51,10 @@ st.metric(label="Total movies", value=f"{counter.loc[0, 'counter']}")
 
 st.write("### Currenty available movies")
 if option:
-   data = df.loc[df['country'].str.contains(option)]
-   AgGrid(data)
+   data = df.loc[df['country'].apply(lambda x: True if option in str(x) else False)]
+   if data.shape[0] > 0:
+      AgGrid(data)
+   else:
+      st.write("#### No movies for {option}") 
 else:
    AgGrid(df)
