@@ -22,26 +22,36 @@ select_all = '''
   LIMIT 500;
 '''
 
+counter = '''
+SELECT COUNT(DISTINCT kinopoisk_id) as counter FROM films;
+'''
+
 # Initialize connection.
 conn = st.connection("postgresql", type="sql")
 
 # Perform query.
 df = conn.query(select_all, ttl="1m").reset_index(drop=True)
+counter = conn.query(counter, ttl="1m").reset_index(drop=True)
 
+uniq_countries = [i for sublst in df['country'].unique() for i in sublst]
 option = st.selectbox(
    "Movies of what country to show? (not active)",
-   ("Email", "Home phone", "Mobile phone"),
+   (uniq_countries),
    index=None,
    placeholder="Select country...",
 )
 
-# uniq_countries = [i for sublst in df['country'].unique() for i in sublst] 
 
-# country = st.select("Choose country", list(df.index), uniq_countries)
 # if not country:
 #     st.error("Please select at least one country.")
 # else:
 #     data = df.loc[df['country'].str.contains(country)]
 #     st.write("### Currenty available movies", data.sort_index())
+st.metric(label="Total movies", value=f"{counter.loc[0, 'counter']}")
+
 st.write("### Currenty available movies")
-AgGrid(df)
+if option:
+   data = df.loc[df['country'].str.contains(option)]
+   AgGrid(data)
+else:
+   AgGrid(df)
