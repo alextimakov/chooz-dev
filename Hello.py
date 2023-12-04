@@ -1,51 +1,30 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022)
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# streamlit_app.py
 
 import streamlit as st
-from streamlit.logger import get_logger
+from st_aggrid import AgGrid
 
-LOGGER = get_logger(__name__)
+from scripts import select_all
 
+# Initialize connection.
+conn = st.connection("postgresql", type="sql")
 
-def run():
-    st.set_page_config(
-        page_title="Hello",
-        page_icon="👋",
-    )
+# Perform query.
+df = conn.query(select_all, ttl="1m").reset_index(drop=True)
 
-    st.write("# Welcome to Streamlit! 👋")
+option = st.selectbox(
+   "Movies of what country to show?",
+   ("Email", "Home phone", "Mobile phone"),
+   index=None,
+   placeholder="Select country...",
+)
 
-    st.sidebar.success("Select a demo above.")
+# uniq_countries = [i for sublst in df['country'].unique() for i in sublst] 
 
-    st.markdown(
-        """
-        Streamlit is an open-source app framework built specifically for
-        Machine Learning and Data Science projects.
-        **👈 Select a demo from the sidebar** to see some examples
-        of what Streamlit can do!
-        ### Want to learn more?
-        - Check out [streamlit.io](https://streamlit.io)
-        - Jump into our [documentation](https://docs.streamlit.io)
-        - Ask a question in our [community
-          forums](https://discuss.streamlit.io)
-        ### See more complex demos
-        - Use a neural net to [analyze the Udacity Self-driving Car Image
-          Dataset](https://github.com/streamlit/demo-self-driving)
-        - Explore a [New York City rideshare dataset](https://github.com/streamlit/demo-uber-nyc-pickups)
-    """
-    )
+# country = st.select("Choose country", list(df.index), uniq_countries)
+# if not country:
+#     st.error("Please select at least one country.")
+# else:
+#     data = df.loc[df['country'].str.contains(country)]
+#     st.write("### Currenty available movies", data.sort_index())
 
-
-if __name__ == "__main__":
-    run()
+AgGrid(df)
