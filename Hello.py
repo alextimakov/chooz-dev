@@ -33,7 +33,7 @@ conn = st.connection("postgresql", type="sql")
 df = conn.query(select_all, ttl="1m").reset_index(drop=True)
 counter = conn.query(counter, ttl="1m").reset_index(drop=True)
 
-uniq_countries = [i for sublst in df['country'].unique() for i in sublst]
+uniq_countries = set([i for sublst in df['country'].values for i in sublst])
 option = st.selectbox(
    "Movies of what country to show? (not active)",
    (uniq_countries),
