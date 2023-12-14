@@ -49,7 +49,7 @@ counter = conn.query(counter_q, ttl="1m").reset_index(drop=True)
 countries = conn.query(countries_q, ttl="1m").reset_index(drop=True)
 genres = conn.query(genres_q, ttl="1m").reset_index(drop=True)
 
-uniq_countries = list(['country'].unique())
+uniq_countries = list(countries['country'].unique())
 uniq_genres = list(genres['genre'].unique())
 option_c = st.selectbox(
    "Movies of what country to show?",
