@@ -76,4 +76,6 @@ if option_g:
 if data.shape[0] > 0:
    AgGrid(data)
 else:
+   option_c = option_c or ''
+   option_g = option_g or ''
    st.write("#### No movies for {option_c} and {option_g}")
