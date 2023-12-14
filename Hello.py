@@ -20,22 +20,24 @@ select_all = '''
   LIMIT 100;
 '''
 
-counter = '''
+counter_q = '''
 SELECT 
    COUNT(DISTINCT kinopoisk_id) as counter 
 FROM movies;
 '''
 
-countries = '''
-SELECT DISTINCT 
-   ARRAY(select jsonb_array_elements(countries::jsonb) ->> 'country') as country
-FROM movies;
+countries_q = '''
+select 
+   distinct country 
+from movies, 
+unnest (ARRAY (SELECT jsonb_array_elements(countries::jsonb) ->> 'country')) country;
 '''
 
-genres = '''
-SELECT DISTINCT 
-   ARRAY(select jsonb_array_elements(genres::jsonb) ->> 'genre') as genre
-FROM movies;
+genres_q = '''
+select 
+   distinct genre 
+from movies, 
+unnest (ARRAY (SELECT jsonb_array_elements(genres::jsonb) ->> 'genre')) genre;
 '''
 
 # Initialize connection.
@@ -43,11 +45,11 @@ conn = st.connection("postgresql", type="sql")
 
 # Perform query.
 df = conn.query(select_all, ttl="1m").reset_index(drop=True)
-counter = conn.query(counter, ttl="1m").reset_index(drop=True)
-countries = conn.query(countries, ttl="1m").reset_index(drop=True)
-genres = conn.query(genres, ttl="1m").reset_index(drop=True)
+counter = conn.query(counter_q, ttl="1m").reset_index(drop=True)
+countries = conn.query(countries_q, ttl="1m").reset_index(drop=True)
+genres = conn.query(genres_q, ttl="1m").reset_index(drop=True)
 
-uniq_countries = list(countries['country'].unique())
+uniq_countries = list(['country'].unique())
 uniq_genres = list(genres['genre'].unique())
 option_c = st.selectbox(
    "Movies of what country to show?",
